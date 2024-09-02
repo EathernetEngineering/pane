@@ -1,12 +1,12 @@
-#ifndef NANJAE_CPU_H_
-#define NANJAE_CPU_H_
+#ifndef CEE_PANE_CPU_H_
+#define CEE_PANE_CPU_H_
 
 #include <memory>
 #include <unistd.h>
 
 #include "ram.h"
 
-namespace nanjae {
+namespace pane {
 
 enum ProcessorFlags {
 	SR_NONE      = 0,

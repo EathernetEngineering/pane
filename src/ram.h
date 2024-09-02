@@ -1,5 +1,5 @@
-#ifndef NANJAE_RAM_H_
-#define NANJAE_RAM_H_
+#ifndef CEE_PANE_RAM_H_
+#define CEE_PANE_RAM_H_
 
 #include <cstdint>
 #include <cstddef>
@@ -8,7 +8,7 @@
 #define NMI_ADDRESS 0xFFFA
 #define RESET_ADDRESS 0xFFFC
 
-namespace nanjae {
+namespace pane {
 class RAM {
 public:
 	RAM();

@@ -3,7 +3,7 @@
 #include <cstdlib>
 #include <new>
 
-namespace nanjae {
+namespace pane {
 RAM::RAM() {
 	m_pBuffer = reinterpret_cast<int8_t*>(calloc(1, 0xFFFF)); // allocate 16K, maximum memory for the 6502
 	if (m_pBuffer == nullptr) {

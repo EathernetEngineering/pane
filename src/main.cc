@@ -1,22 +1,28 @@
+#include <stdexcept>
 #include <iostream>
-#include <cstdlib>
-#include <memory>
 
-#include "cpu.h"
+#include <cstdlib>
+
+
+#include "emulator.h"
 
 int main(int argc, char** argv) {
-	std::shared_ptr<nanjae::CPU> cpu = std::make_shared<nanjae::CPU>();
-	std::shared_ptr<nanjae::RAM> ram = std::make_shared<nanjae::RAM>();
 
-	cpu->SetRAM(ram);
+	pane::Emulator emu;
 
 	try {
-		while (1) {
-			cpu->Execute();
-		}
-	} catch (std::exception& e) {
-		std::cout << e.what() << std::endl;
+		emu.Init();
+	} catch (const std::runtime_error& e) {
+		std::cout << "Initialization error: " << e.what() << std::endl;
 	}
+
+	try {
+		emu.Run();
+	} catch (const std::runtime_error& e) {
+		std::cout << "Emulation error: " << e.what() << std::endl;
+	}
+
+	emu.Shutdown();
 
 	return EXIT_SUCCESS;
 }

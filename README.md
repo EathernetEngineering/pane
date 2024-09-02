@@ -1,3 +1,3 @@
-NANJAE is an NES emulator
+Pane is Another NES Emulator 
 ---
 

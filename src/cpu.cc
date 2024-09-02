@@ -5,7 +5,7 @@
 #include <stdexcept>
 #include <format>
 
-namespace nanjae {
+namespace pane {
 CPU::CPU() {
 
 }
