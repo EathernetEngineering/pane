@@ -19,7 +19,7 @@ void Emulator::Init() {
 	m_pCPU->SetRAM(m_pRAM);
 
 	m_pWindow = std::make_shared<Window>();
-	m_pWindow->Init(1280, 720, "jane");
+	m_pWindow->Init(1280, 720, "pane");
 
 	m_pRenderer = std::make_unique<Renderer>();
 	m_pRenderer->Init();

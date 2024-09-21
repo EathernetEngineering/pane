@@ -15,7 +15,16 @@ public:
 	void RenderFrame();
 
 private:
+	static void DebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, const void *userParam);
+
+private:
 	bool m_bInitialized;
+
+	GLuint m_uVAO;
+	GLuint m_uVBO;
+	GLuint m_uIBO;
+	GLuint m_uTexture;
+	GLuint m_uShaderProgram;
 
 	static bool s_bGLInitialized;
 };
