@@ -5,6 +5,8 @@
 
 #include <GL/gl.h>
 
+#include "ppu.h"
+
 namespace pane {
 static const char* g_sVertexShaderGlsl = 
 	"#version 450 core\n"
@@ -87,7 +89,7 @@ void Renderer::Init() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 256, 240, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, PANE_NES_VISIBLE_IMAGE_WIDTH, PANE_NES_VISIBLE_IMAGE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 	GLuint uVertexShader;
 	GLuint uFragmentShader;
@@ -136,6 +138,12 @@ void Renderer::Shutdown() {
 	if (!m_bInitialized) {
 		return;
 	}
+}
+
+void Renderer::UpdateImage(const void* pPixels) {
+	glBindTexture(GL_TEXTURE_2D, m_uTexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, PANE_NES_VISIBLE_IMAGE_WIDTH, PANE_NES_VISIBLE_IMAGE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, pPixels);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Renderer::RenderFrame() {

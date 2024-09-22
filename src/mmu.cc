@@ -15,8 +15,8 @@ MMU::~MMU() {
 
 void MMU::Init() {
 	m_pRAM = reinterpret_cast<uint8_t*>(std::calloc(1, 0x0800));
-	m_pRAM = reinterpret_cast<uint8_t*>(std::calloc(1, 0x2800));
-	m_pRAM = reinterpret_cast<uint8_t*>(std::calloc(1, 0x8000));
+	m_pROMRAM = reinterpret_cast<uint8_t*>(std::calloc(1, 0x2000));
+	m_pROM = reinterpret_cast<uint8_t*>(std::calloc(1, 0x8000));
 }
 
 void MMU::Shutdown() {
@@ -35,6 +35,9 @@ uint8_t MMU::Read(uint16_t pAddress) {
 		pAddress %= 0x0800;
 
 		return *(m_pRAM + pAddress);
+	} else if (pAddress < 0x4000) {
+		pAddress %= 0x0008;
+		return *(m_pPPURegs + pAddress);
 	}
 	return 0xFF;
 }
@@ -51,6 +54,10 @@ void MMU::Write(uint16_t pAddress, uint8_t cVal) {
 		pAddress %= 0x0800;
 
 		*(m_pRAM + pAddress) = cVal;
+	} else if (pAddress < 0x4000) {
+		pAddress %= 0x0008;
+
+		*(m_pPPURegs + pAddress) = cVal;
 	}
 }
 

@@ -12,6 +12,7 @@ public:
 	void Init();
 	void Shutdown();
 
+	void UpdateImage(const void* pPixels);
 	void RenderFrame();
 
 private:

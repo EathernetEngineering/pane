@@ -29,6 +29,10 @@ private:
 	uint8_t* m_pROMRAM;
 	uint8_t* m_pROM;
 
+	uint8_t* m_pPPURegs;
+	uint8_t* m_pAPURegs;
+	uint8_t* m_pAPURegsUnused;
+
 	bool m_bInitialized;
 };
 }

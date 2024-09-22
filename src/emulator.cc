@@ -39,8 +39,12 @@ void Emulator::Shutdown() {
 	
 void Emulator::Run() {
 	while (!m_pWindow->ShouldClose()) {
+		m_pPPU->Execute();
+		m_pPPU->Execute();
+		m_pPPU->Execute();
 		m_pCPU->Execute();
 
+		m_pRenderer->UpdateImage(m_pPPU->GetPixels());
 		m_pRenderer->RenderFrame();
 		m_pWindow->SwapBuffers();
 		m_pWindow->PollEvents();
