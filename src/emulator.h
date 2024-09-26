@@ -3,7 +3,7 @@
 
 #include <memory>
 
-#include "ram.h"
+#include "mmu.h"
 #include "cpu.h"
 #include "ppu.h"
 #include "window.h"
@@ -21,7 +21,7 @@ public:
 	void Run();
 
 private:
-	std::shared_ptr<RAM> m_pRAM;
+	std::shared_ptr<MMU> m_pMMU;
 	std::shared_ptr<CPU> m_pCPU;
 	std::shared_ptr<PPU> m_pPPU;
 

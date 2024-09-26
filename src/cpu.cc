@@ -11,16 +11,16 @@ CPU::CPU() {
 }
 
 CPU::~CPU() {
-	m_pRAM.reset();
+	m_pMMU.reset();
 }
 
-void CPU::SetRAM(std::shared_ptr<RAM> ram) {
-	m_pRAM = ram;
+void CPU::SetMMU(std::shared_ptr<MMU> pMMU) {
+	m_pMMU = pMMU;
 }
 
 void CPU::Start() {
 	std::memset(reinterpret_cast<void*>(&m_xRegs), 0, sizeof(CPU::Registers));
-	m_xRegs.pc = m_pRAM->Read(0xFFFC);
+	m_xRegs.pc = m_pMMU->ReadAddress(RESET_ADDRESS);
 
 	m_bInturruptPending = false;
 	m_eInterruptType = INT_NONE;
@@ -28,8 +28,6 @@ void CPU::Start() {
 	m_xRegs.sr = 0x24;
 
 	m_nCycles = m_nTotalCycles = 0;
-
-	this->Execute();
 }
 
 void CPU::Execute() {
@@ -40,7 +38,7 @@ void CPU::Execute() {
 			m_nCycles = 6;
 			return;
 		}
-		m_nOpCode = m_pRAM->Read(m_xRegs.pc++);
+		m_nOpCode = m_pMMU->Read(m_xRegs.pc++);
 		m_xInstruction = g_xInstructionLUT[m_nOpCode];
 		this->GetOperandAddress();
 
@@ -63,43 +61,43 @@ void CPU::Execute() {
 
 	switch(m_xInstruction.oc) {
 		case OC_ADC:
-			ADC(m_pOperandAddress);
+			ADC();
 			break;
 		
 		case OC_AND:
-			AND(m_pOperandAddress);
+			AND();
 			break;
 		
 		case OC_ASL:
-			m_xInstruction.am == AM_ACC ? ASLACC(m_pOperandAddress) : ASL(m_pOperandAddress);
+			m_xInstruction.am == AM_ACC ? ASLACC() : ASL();
 			break;
 		
 		case OC_BCC:
-			BCC(m_pOperandAddress);
+			BCC();
 			break;
 		
 		case OC_BCS:
-			BCS(m_pOperandAddress);
+			BCS();
 			break;
 		
 		case OC_BEQ:
-			BEQ(m_pOperandAddress);
+			BEQ();
 			break;
 		
 		case OC_BIT:
-			BIT(m_pOperandAddress);
+			BIT();
 			break;
 		
 		case OC_BMI:
-			BMI(m_pOperandAddress);
+			BMI();
 			break;
 		
 		case OC_BNE:
-			BNE(m_pOperandAddress);
+			BNE();
 			break;
 		
 		case OC_BPL:
-			BPL(m_pOperandAddress);
+			BPL();
 			break;
 		
 		case OC_BRK:
@@ -107,11 +105,11 @@ void CPU::Execute() {
 			break;
 		
 		case OC_BVC:
-			BVC(m_pOperandAddress);
+			BVC();
 			break;
 		
 		case OC_BVS:
-			BVS(m_pOperandAddress);
+			BVS();
 			break;
 		
 		case OC_CLC:
@@ -131,19 +129,19 @@ void CPU::Execute() {
 			break;
 		
 		case OC_CMP:
-			CMP(m_pOperandAddress);
+			CMP();
 			break;
 		
 		case OC_CPX:
-			CPX(m_pOperandAddress);
+			CPX();
 			break;
 		
 		case OC_CPY:
-			CPY(m_pOperandAddress);
+			CPY();
 			break;
 		
 		case OC_DEC:
-			DEC(m_pOperandAddress);
+			DEC();
 			break;
 		
 		case OC_DEX:
@@ -155,11 +153,11 @@ void CPU::Execute() {
 			break;
 		
 		case OC_EOR:
-			EOR(m_pOperandAddress);
+			EOR();
 			break;
 		
 		case OC_INC:
-			INC(m_pOperandAddress);
+			INC();
 			break;
 		
 		case OC_INX:
@@ -171,27 +169,27 @@ void CPU::Execute() {
 			break;
 		
 		case OC_JMP:
-			JMP(m_pOperandAddress);
+			JMP();
 			break;
 		
 		case OC_JSR:
-			JSR(m_pOperandAddress);
+			JSR();
 			break;
 		
 		case OC_LDA:
-			LDA(m_pOperandAddress);
+			LDA();
 			break;
 		
 		case OC_LDX:
-			LDX(m_pOperandAddress);
+			LDX();
 			break;
 		
 		case OC_LDY:
-			LDY(m_pOperandAddress);
+			LDY();
 			break;
 		
 		case OC_LSR:
-			m_xInstruction.am == AM_ACC ? LSRACC(m_pOperandAddress) : LSR(m_pOperandAddress);
+			m_xInstruction.am == AM_ACC ? LSRACC() : LSR();
 			break;
 		
 		case OC_NOP:
@@ -199,7 +197,7 @@ void CPU::Execute() {
 			break;
 		
 		case OC_ORA:
-			ORA(m_pOperandAddress);
+			ORA();
 			break;
 		
 		case OC_PHA:
@@ -219,23 +217,23 @@ void CPU::Execute() {
 			break;
 		
 		case OC_ROL:
-			m_xInstruction.am == AM_ACC ? ROLACC(m_pOperandAddress) : ROL(m_pOperandAddress);
+			m_xInstruction.am == AM_ACC ? ROLACC() : ROL();
 			break;
 		
 		case OC_ROR:
-			m_xInstruction.am == AM_ACC ? RORACC(m_pOperandAddress) : ROR(m_pOperandAddress);
+			m_xInstruction.am == AM_ACC ? RORACC() : ROR();
 			break;
 		
 		case OC_RTI:
-			RTI(m_pOperandAddress);
+			RTI();
 			break;
 		
 		case OC_RTS:
-			RTS(m_pOperandAddress);
+			RTS();
 			break;
 		
 		case OC_SBC:
-			SBC(m_pOperandAddress);
+			SBC();
 			break;
 		
 		case OC_SEC:
@@ -251,15 +249,15 @@ void CPU::Execute() {
 			break;
 		
 		case OC_STA:
-			STA(m_pOperandAddress);
+			STA();
 			break;
 		
 		case OC_STX:
-			STX(m_pOperandAddress);
+			STX();
 			break;
 		
 		case OC_STY:
-			STY(m_pOperandAddress);
+			STY();
 			break;
 		
 		case OC_TAX:
@@ -298,13 +296,13 @@ void CPU::Interrupt(InterruptType t) {
 void CPU::Reset() {
 	m_xRegs.sr |= SR_INTERRUPT;
 	m_xRegs.sp -= 3;
-	m_xRegs.pc = m_pRAM->ReadWord(RESET_ADDRESS);
+	m_xRegs.pc = m_pMMU->ReadAddress(RESET_ADDRESS);
 	m_nCycles = 0;
 }
 
-void CPU::ADC(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
-	int16_t result = m_xRegs.ac + opr + ((m_xRegs.sr & SR_CARRY) != 0);
+void CPU::ADC() {
+	uint8_t opr = m_pMMU->Read(m_pOperandAddress);
+	uint16_t result = m_xRegs.ac + opr + ((m_xRegs.sr & SR_CARRY) != 0);
 	
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE | SR_OVERFLOW);
 	this->CheckAndSetCarryFlag(result);
@@ -314,8 +312,8 @@ void CPU::ADC(uint16_t oprAddr) {
 	m_xRegs.ac = result & 0xFF;
 }
 
-void CPU::AND(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::AND() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int8_t result = m_xRegs.ac & opr;
 
 	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
@@ -324,17 +322,17 @@ void CPU::AND(uint16_t oprAddr) {
 	m_xRegs.ac = result;
 }
 
-void CPU::ASL(uint16_t oprAddr) {
-	int16_t result = m_pRAM->Read(oprAddr) << 1;
+void CPU::ASL() {
+	int16_t result = static_cast<int16_t>(m_pMMU->Read(m_pOperandAddress)) << 1;
 
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetZNFlags(result);
 	this->CheckAndSetCarryFlag(result);
 
-	m_pRAM->Write(oprAddr, result & 0xFF);
+	m_pMMU->Write(m_pOperandAddress, result & 0xFF);
 }
 
-void CPU::ASLACC(uint16_t oprAddr) {
+void CPU::ASLACC() {
 	int16_t result = m_xRegs.ac << 1;
 
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE);
@@ -344,26 +342,26 @@ void CPU::ASLACC(uint16_t oprAddr) {
 	m_xRegs.ac = result & 0xFF;
 }
 
-void CPU::BCC(uint16_t oprAddr) {
+void CPU::BCC() {
 	if (!(m_xRegs.sr & SR_CARRY)) {
-		m_xRegs.pc = oprAddr;
+		m_xRegs.pc = m_pOperandAddress;
 	}
 }
 
-void CPU::BCS(uint16_t oprAddr) {
+void CPU::BCS() {
 	if (m_xRegs.sr & SR_CARRY) {
-		m_xRegs.pc = oprAddr;
+		m_xRegs.pc = m_pOperandAddress;
 	}
 }
 
-void CPU::BEQ(uint16_t oprAddr) {
+void CPU::BEQ() {
 	if (m_xRegs.sr & SR_ZERO) {
-		m_xRegs.pc = oprAddr;
+		m_xRegs.pc = m_pOperandAddress;
 	}
 }
 
-void CPU::BIT(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::BIT() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int8_t result = m_xRegs.ac & opr;
 
 	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE | SR_OVERFLOW);
@@ -371,43 +369,41 @@ void CPU::BIT(uint16_t oprAddr) {
 	m_xRegs.sr |= opr & (SR_NEGATIVE | SR_OVERFLOW);
 }
 
-void CPU::BMI(uint16_t oprAddr) {
+void CPU::BMI() {
 	if (m_xRegs.sr & SR_NEGATIVE) {
-		m_xRegs.pc = oprAddr;
+		m_xRegs.pc = m_pOperandAddress;
 	}
 }
 
-void CPU::BNE(uint16_t oprAddr) {
+void CPU::BNE() {
 	if (!(m_xRegs.sr & SR_ZERO)) {
-		m_xRegs.pc = oprAddr;
+		m_xRegs.pc = m_pOperandAddress;
 	}
 }
 
-void CPU::BPL(uint16_t oprAddr) {
+void CPU::BPL() {
 	if (!(m_xRegs.sr & SR_NEGATIVE)) {
-		m_xRegs.pc = oprAddr;
+		m_xRegs.pc = m_pOperandAddress;
 	}
 }
 
 void CPU::BRK() {
-	m_xRegs.sp -= 2;
-	m_pRAM->StackWriteWord(m_xRegs.sp, m_xRegs.pc + 2);
+	m_pMMU->PushAddress(&m_xRegs.sp, m_xRegs.pc);
 	m_xRegs.sr |= SR_INTERRUPT;
-	m_xRegs.sp -= 1;
-	m_pRAM->StackWrite(m_xRegs.sp, m_xRegs.sr);
+	m_pMMU->Push(&m_xRegs.sp, m_xRegs.sr);
 
-	m_xRegs.pc = m_pRAM->ReadWord(IRQ_ADDRESS);
+	m_xRegs.pc = m_pMMU->ReadAddress(IRQ_ADDRESS);
 }
 
-void CPU::BVC(uint16_t oprAddr) {
+void CPU::BVC() {
 	if (!(m_xRegs.sr & SR_OVERFLOW)) {
-		m_xRegs.pc = oprAddr;
+		m_xRegs.pc = m_pOperandAddress;
 	}
 }
 
-void CPU::BVS(uint16_t oprAddr) {
+void CPU::BVS() {
 	if (m_xRegs.sr & SR_OVERFLOW) {
-		m_xRegs.pc = oprAddr;
+		m_xRegs.pc = m_pOperandAddress;
 	}
 }
 
@@ -427,41 +423,41 @@ void CPU::CLV() {
 	m_xRegs.sr &= ~(SR_OVERFLOW);
 }
 
-void CPU::CMP(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
-	int16_t result = m_xRegs.ac - opr;
+void CPU::CMP() {
+	uint8_t opr = m_pMMU->Read(m_pOperandAddress);
+	uint16_t result = m_xRegs.ac - opr;
 
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetCarryFlag(result);
 	this->CheckAndSetZNFlags(result);
 }
 
-void CPU::CPX(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
-	int16_t result = m_xRegs.x - opr;
+void CPU::CPX() {
+	uint8_t opr = m_pMMU->Read(m_pOperandAddress);
+	uint16_t result = m_xRegs.x - opr;
 
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetCarryFlag(result);
 	this->CheckAndSetZNFlags(result);
 }
 
-void CPU::CPY(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
-	int16_t result = m_xRegs.y - opr;
+void CPU::CPY() {
+	uint8_t opr = m_pMMU->Read(m_pOperandAddress);
+	uint16_t result = m_xRegs.y - opr;
 
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetCarryFlag(result);
 	this->CheckAndSetZNFlags(result);
 }
 
-void CPU::DEC(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::DEC() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int16_t result = opr - 1;
 
 	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetZNFlags(result);
 
-	m_pRAM->Write(oprAddr, result);
+	m_pMMU->Write(m_pOperandAddress, result);
 }
 
 void CPU::DEX() {
@@ -482,8 +478,8 @@ void CPU::DEY() {
 	m_xRegs.x = result;
 }
 
-void CPU::EOR(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::EOR() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int8_t result = opr ^ m_xRegs.ac;
 
 	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
@@ -492,14 +488,14 @@ void CPU::EOR(uint16_t oprAddr) {
 	m_xRegs.ac = result;
 }
 
-void CPU::INC(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::INC() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int16_t result = opr + 1;
 
 	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetZNFlags(result);
 
-	m_pRAM->Write(oprAddr, result);
+	m_pMMU->Write(m_pOperandAddress, result);
 }
 
 void CPU::INX() {
@@ -520,49 +516,59 @@ void CPU::INY() {
 	m_xRegs.x = result;
 }
 
-void CPU::JMP(uint16_t oprAddr) {
-	m_xRegs.pc = m_pRAM->ReadWord(oprAddr);
+void CPU::JMP() {
+	m_xRegs.pc = m_pMMU->ReadAddress(m_pOperandAddress);
 }
 
-void CPU::JSR(uint16_t oprAddr) {
-	m_xRegs.sp -= 2;
-	m_pRAM->StackWriteWord(m_xRegs.sp, m_xRegs.pc + 2);
-	m_xRegs.pc = m_pRAM->ReadWord(oprAddr);
+void CPU::JSR() {
+	m_pMMU->PushAddress(&m_xRegs.sp, m_xRegs.pc);
+	m_xRegs.pc = m_pMMU->ReadAddress(m_pOperandAddress);
 }
 
-void CPU::LDA(uint16_t oprAddr) {
-	m_xRegs.ac = m_pRAM->Read(oprAddr);
-	CheckAndSetZNFlags(m_xRegs.ac);
+void CPU::LDA() {
+	m_xRegs.ac = m_pMMU->Read(m_pOperandAddress);
+	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
+	this->CheckAndSetZNFlags(m_xRegs.ac);
 }
 
-void CPU::LDX(uint16_t oprAddr) {
-	m_xRegs.x = m_pRAM->Read(oprAddr);
-	CheckAndSetZNFlags(m_xRegs.x);
+void CPU::LDX() {
+	m_xRegs.x = m_pMMU->Read(m_pOperandAddress);
+	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
+	this->CheckAndSetZNFlags(m_xRegs.x);
 }
 
-void CPU::LDY(uint16_t oprAddr) {
-	m_xRegs.y = m_pRAM->Read(oprAddr);
-	CheckAndSetZNFlags(m_xRegs.y);
+void CPU::LDY() {
+	m_xRegs.y = m_pMMU->Read(m_pOperandAddress);
+	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
+	this->CheckAndSetZNFlags(m_xRegs.y);
 }
 
-void CPU::LSR(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::LSR() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int16_t result = opr >> 1;
+	// Ensure bit shifted in is zero.
+	result &= 0x7F;
 
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetZNFlags(result);
-	this->CheckAndSetCarryFlag(result & 1 ? 0xFFFF : 0x0000);
+	this->CheckAndSetCarryFlag(opr & 1 ? 0xFFFF : 0x0000);
+	// Ensure negative flag is set to zero.
+	m_xRegs.sr &= ~(SR_NEGATIVE);
 
-	m_pRAM->Write(oprAddr, result & 0xFF);
+	m_pMMU->Write(m_pOperandAddress, result & 0xFF);
 }
 
-void CPU::LSRACC(uint16_t oprAddr) {
+void CPU::LSRACC() {
 	int8_t opr = m_xRegs.ac;
 	int16_t result = m_xRegs.ac >> 1;
+	// Ensure bit shifted in is zero.
+	result &= 0x7F;
 
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetZNFlags(result);
-	this->CheckAndSetCarryFlag(result & 1 ? 0xFFFF : 0x0000);
+	this->CheckAndSetCarryFlag(opr & 1 ? 0xFFFF : 0x0000);
+	// Ensure negative flag is set to zero.
+	m_xRegs.sr &= ~(SR_NEGATIVE);
 
 	m_xRegs.ac = result & 0xFF;
 }
@@ -571,8 +577,8 @@ void CPU::NOP() {
 	;
 }
 
-void CPU::ORA(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::ORA() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int8_t result = m_xRegs.ac | opr;
 
 	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
@@ -582,41 +588,37 @@ void CPU::ORA(uint16_t oprAddr) {
 }
 
 void CPU::PHA() {
-	m_xRegs.sp--;
-	m_pRAM->Write(m_xRegs.sp, m_xRegs.ac);
+	m_pMMU->Push(&m_xRegs.sp, m_xRegs.ac);
 }
 
 void CPU::PHP() {
-	m_xRegs.sp--;
-	m_pRAM->Write(m_xRegs.sp, m_xRegs.sr | SR_INTERRUPT | 1 << 5);
+	m_pMMU->Push(&m_xRegs.sp, m_xRegs.sr | SR_INTERRUPT | 1 << 5);
 }
 
 void CPU::PLA() {
-	m_xRegs.ac = m_pRAM->Read(m_xRegs.sp);
-	m_xRegs.sp++;
+	m_xRegs.ac = m_pMMU->Pull(&m_xRegs.sp);
 
 	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
 	this->CheckAndSetZNFlags(m_xRegs.ac);
 }
 
 void CPU::PLP() {
-	m_xRegs.sr = m_pRAM->Read(m_xRegs.sp);
-	m_xRegs.sp++;
+	m_xRegs.sr = m_pMMU->Pull(&m_xRegs.sp);
 }
 
-void CPU::ROL(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::ROL() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int16_t result = static_cast<int16_t>(opr) << 1;
 	result |= (m_xRegs.sr ^ SR_CARRY) != m_xRegs.sr;
 
 	this->CheckAndSetZNFlags(result);
 	this->CheckAndSetCarryFlag(result);
 
-	m_pRAM->Write(oprAddr, result);
+	m_pMMU->Write(m_pOperandAddress, result);
 }
 
-void CPU::ROLACC(uint16_t oprAddr) {
-	int16_t result = oprAddr << 1;
+void CPU::ROLACC() {
+	int16_t result = static_cast<int16_t>(m_pOperandAddress) << 1;
 	result |= (m_xRegs.sr ^ SR_CARRY) != m_xRegs.sr;
 
 	this->CheckAndSetZNFlags(result);
@@ -625,55 +627,51 @@ void CPU::ROLACC(uint16_t oprAddr) {
 	m_xRegs.ac = static_cast<int8_t>(result);
 }
 
-void CPU::ROR(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
+void CPU::ROR() {
+	int8_t opr = m_pMMU->Read(m_pOperandAddress);
 	int16_t result = static_cast<int16_t>(opr) >> 1;
 	result |= ((m_xRegs.sr ^ SR_CARRY) != m_xRegs.sr) << 7;
 
 	this->CheckAndSetZNFlags(result);
 	this->CheckAndSetCarryFlag(opr & 1 ? 0xFFFF : 0x0000);
 
-	m_pRAM->Write(oprAddr, result);
+	m_pMMU->Write(m_pOperandAddress, result);
 }
 
-void CPU::RORACC(uint16_t oprAddr) {
-	int16_t result = oprAddr >> 1;
+void CPU::RORACC() {
+	int16_t result = static_cast<int16_t>(m_pOperandAddress) >> 1;
 	result |= ((m_xRegs.sr ^ SR_CARRY) != m_xRegs.sr) << 7;
 
 	this->CheckAndSetZNFlags(result);
-	this->CheckAndSetCarryFlag(oprAddr & 1 ? 0xFFFF : 0x0000);
+	this->CheckAndSetCarryFlag(m_pOperandAddress & 1 ? 0xFFFF : 0x0000);
 
 	m_xRegs.ac = result;
 }
 
-void CPU::RTI(uint16_t oprAddr) {
-	m_xRegs.sr = m_pRAM->StackRead(m_xRegs.sp);
-	m_xRegs.sp -= 1;
-	m_xRegs.pc = m_pRAM->StackReadWord(m_xRegs.sp);
-	m_xRegs.sp -= 2;
+void CPU::RTI() {
+	m_xRegs.sr = m_pMMU->Pull(&m_xRegs.sp);
+	m_xRegs.pc = m_pMMU->PullAddress(&m_xRegs.sp);
 }
 
-void CPU::RTS(uint16_t oprAddr) {
-	m_xRegs.pc = m_pRAM->StackReadWord(m_xRegs.sp);
-	m_xRegs.sp -= 2;
-	m_xRegs.pc++;
+void CPU::RTS() {
+	m_xRegs.pc = m_pMMU->PullAddress(&m_xRegs.sp);
 }
 
-void CPU::SBC(uint16_t oprAddr) {
-	int8_t opr = m_pRAM->Read(oprAddr);
-	int16_t result = m_xRegs.ac - opr - ((m_xRegs.sr & SR_CARRY) != 0);
+void CPU::SBC() {
+	uint8_t opr = m_pMMU->Read(m_pOperandAddress);
+	uint16_t result = m_xRegs.ac - opr - ((m_xRegs.sr & SR_CARRY) == 0);
 
 	m_xRegs.sr &= ~(SR_CARRY | SR_ZERO | SR_NEGATIVE | SR_OVERFLOW);
 	
 	this->CheckAndSetCarryFlag(result);
-	this->CheckAndSetOverflowFlag(result, m_xRegs.ac, opr);
+	this->CheckAndSetOverflowFlag(result, m_xRegs.ac, ~opr);
 	this->CheckAndSetZNFlags(result);
 
 	m_xRegs.ac = result & 0xFF;
 }
 
 void CPU::SEC() {
-	m_xRegs.sr = SR_CARRY;
+	m_xRegs.sr |= SR_CARRY;
 }
 
 void CPU::SED() {
@@ -681,35 +679,47 @@ void CPU::SED() {
 }
 
 void CPU::SEI() {
-	m_xRegs.sr = SR_INTERRUPT;
+	m_xRegs.sr |= SR_INTERRUPT;
 }
 
-void CPU::STA(uint16_t oprAddr) {
-	m_pRAM->Write(oprAddr, m_xRegs.ac);
+void CPU::STA() {
+	m_pMMU->Write(m_pOperandAddress, m_xRegs.ac);
 }
 
-void CPU::STX(uint16_t oprAddr) {
-	m_pRAM->Write(oprAddr, m_xRegs.x);
+void CPU::STX() {
+	m_pMMU->Write(m_pOperandAddress, m_xRegs.x);
 }
 
-void CPU::STY(uint16_t oprAddr) {
-	m_pRAM->Write(oprAddr, m_xRegs.y);
+void CPU::STY() {
+	m_pMMU->Write(m_pOperandAddress, m_xRegs.y);
 }
 
 void CPU::TAX() {
 	m_xRegs.x = m_xRegs.ac;
+	
+	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
+	this->CheckAndSetZNFlags(m_xRegs.x);
 }
 
 void CPU::TAY() {
 	m_xRegs.y = m_xRegs.ac;
+	
+	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
+	this->CheckAndSetZNFlags(m_xRegs.y);
 }
 
 void CPU::TSX() {
 	m_xRegs.x = m_xRegs.sp;
+	
+	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
+	this->CheckAndSetZNFlags(m_xRegs.x);
 }
 
 void CPU::TXA() {
 	m_xRegs.ac = m_xRegs.x;
+	
+	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
+	this->CheckAndSetZNFlags(m_xRegs.ac);
 }
 
 void CPU::TXS() {
@@ -718,20 +728,23 @@ void CPU::TXS() {
 
 void CPU::TYA() {
 	m_xRegs.ac = m_xRegs.y;
+
+	m_xRegs.sr &= ~(SR_ZERO | SR_NEGATIVE);
+	this->CheckAndSetZNFlags(m_xRegs.ac);
 }
 
 void CPU::GetOperandAddress() {
 	switch (m_xInstruction.am) {
 	case AM_ACC:
-		m_pRAM->ReadWord(m_xRegs.pc); // Dummy read
+		m_pMMU->ReadAddress(m_xRegs.pc); // Dummy read
 		m_pOperandAddress = m_xRegs.ac;
 		return;
 	case AM_ABS:
-		m_pOperandAddress = m_pRAM->ReadWord(m_xRegs.pc);
+		m_pOperandAddress = m_xRegs.pc;
 		m_xRegs.pc += 2;
 		return;
 	case AM_ABSX:
-		m_pOperandAddress = m_pRAM->ReadWord(m_xRegs.pc);
+		m_pOperandAddress = m_xRegs.pc;
 		m_xRegs.pc += 2;
 		switch (m_xInstruction.oc) {
 		case OC_STA:
@@ -748,7 +761,7 @@ void CPU::GetOperandAddress() {
 		m_pOperandAddress += m_xRegs.x;
 		return;
 	case AM_ABSY:
-		m_pOperandAddress = m_pRAM->ReadWord(m_xRegs.pc);
+		m_pOperandAddress = m_xRegs.pc;
 		m_xRegs.pc += 2;
 		switch (m_xInstruction.oc) {
 		case OC_STA:
@@ -772,16 +785,16 @@ void CPU::GetOperandAddress() {
 		m_pOperandAddress = 0;;
 		return;
 	case AM_IND:
-		m_pOperandAddress = m_pRAM->ReadWord(m_pRAM->ReadWord(m_xRegs.pc));
+		m_pOperandAddress = m_pMMU->ReadAddress(m_pMMU->ReadAddress(m_xRegs.pc));
 		m_xRegs.pc += 2;
 		return;
 	case AM_XIND:
-		m_pOperandAddress = m_pRAM->ReadWord(m_pRAM->ReadWord(m_xRegs.pc) + m_xRegs.x);
-		m_xRegs.pc += 2;
+		m_pOperandAddress = m_pMMU->ReadAddress(m_pMMU->Read(m_xRegs.pc) + m_xRegs.x);
+		m_xRegs.pc += 1;
 		return;
 	case AM_INDY:
-		m_pOperandAddress = m_pRAM->ReadWord(m_pRAM->ReadWord(m_xRegs.pc));
-		m_xRegs.pc += 2;
+		m_pOperandAddress = m_pMMU->ReadAddress(m_pMMU->Read(m_xRegs.pc));
+		m_xRegs.pc += 1;
 		switch (m_xInstruction.oc) {
 		case OC_STA:
 		case OC_ASL:
@@ -794,27 +807,27 @@ void CPU::GetOperandAddress() {
 		default:
 			CheckIfPageBarrierCrossed(m_pOperandAddress, m_pOperandAddress + m_xRegs.y);
 		}
-		m_pOperandAddress = m_pOperandAddress + m_xRegs.y;
+		m_pOperandAddress += m_xRegs.y;
 		return;
 	case AM_REL: {
-			int16_t offset = m_pRAM->Read(m_xRegs.pc);
+			int16_t offset = m_pMMU->Read(m_xRegs.pc);
 			if (offset & 0x80) {
 				offset |= 0xFF00;
 			}
-			m_pOperandAddress = m_xRegs.pc + offset;
 			m_xRegs.pc += 1;
+			m_pOperandAddress = m_xRegs.pc + offset;
 			return;
 		}
 	case AM_ZPG:
-		m_pOperandAddress = m_pRAM->Read(m_xRegs.pc);
+		m_pOperandAddress = m_pMMU->Read(m_xRegs.pc);
 		m_xRegs.pc += 1;
 		return;
 	case AM_ZPGX:
-		m_pOperandAddress = m_pRAM->Read(m_xRegs.pc) + m_xRegs.x;
+		m_pOperandAddress = static_cast<uint8_t>(m_pMMU->Read(m_xRegs.pc) + m_xRegs.x);
 		m_xRegs.pc += 1;
 		return;
 	case AM_ZPGY:
-		m_pOperandAddress = m_pRAM->Read(m_xRegs.pc) + m_xRegs.y;
+		m_pOperandAddress = static_cast<uint8_t>(m_pMMU->Read(m_xRegs.pc) + m_xRegs.y);
 		m_xRegs.pc += 1;
 		return;
 	default:
@@ -860,11 +873,9 @@ void CPU::HandleInterrupt() {
 
 	m_eInterruptType = INT_NONE;
 
-	m_xRegs.sp -= 2;
-	m_pRAM->StackWriteWord(m_xRegs.sp, m_xRegs.pc);
+	m_pMMU->PushAddress(&m_xRegs.sp, m_xRegs.pc);
 	m_xRegs.sr |= SR_INTERRUPT;
-	m_xRegs.sp -= 1;
-	m_pRAM->StackWrite(m_xRegs.sp, m_xRegs.sr);
+	m_pMMU->Push(&m_xRegs.sp, m_xRegs.sr);
 }
 }
 

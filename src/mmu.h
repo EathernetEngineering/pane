@@ -2,6 +2,7 @@
 #define CEE_PANE_MMU_H_
 
 #include <cstdint>
+#include <cstddef>
 
 namespace pane {
 class MMU {
@@ -24,10 +25,11 @@ public:
 	void PushAddress(uint8_t* ppSp, uint16_t pVal);
 	uint16_t PullAddress(uint8_t* ppSp);
 
+	void LoadROM(const void* src, uintptr_t dst, size_t size);
+
 private:
 	uint8_t* m_pRAM;
-	uint8_t* m_pROMRAM;
-	uint8_t* m_pROM;
+	uint8_t* m_pCartridge;
 
 	uint8_t* m_pPPURegs;
 	uint8_t* m_pAPURegs;

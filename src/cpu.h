@@ -4,7 +4,7 @@
 #include <memory>
 #include <unistd.h>
 
-#include "ram.h"
+#include "mmu.h"
 
 namespace pane {
 
@@ -154,7 +154,7 @@ public:
 	CPU();
 	~CPU();
 
-	void SetRAM(std::shared_ptr<RAM> ram);
+	void SetMMU(std::shared_ptr<MMU> pMMU);
 
 	void Start();
 	void Execute();
@@ -163,60 +163,60 @@ public:
 	void Reset();
 
 private:
-	void ADC(uint16_t oprAddr);
-	void AND(uint16_t oprAddr);
-	void ASL(uint16_t oprAddr);
-	void ASLACC(uint16_t oprAddr);
-	void BCC(uint16_t oprAddr);
-	void BCS(uint16_t oprAddr);
-	void BEQ(uint16_t oprAddr);
-	void BIT(uint16_t oprAddr);
-	void BMI(uint16_t oprAddr);
-	void BNE(uint16_t oprAddr);
-	void BPL(uint16_t oprAddr);
+	void ADC();
+	void AND();
+	void ASL();
+	void ASLACC();
+	void BCC();
+	void BCS();
+	void BEQ();
+	void BIT();
+	void BMI();
+	void BNE();
+	void BPL();
 	void BRK();
-	void BVC(uint16_t oprAddr);
-	void BVS(uint16_t oprAddr);
+	void BVC();
+	void BVS();
 	void CLC();
 	void CLD();
 	void CLI();
 	void CLV();
-	void CMP(uint16_t oprAddr);
-	void CPX(uint16_t oprAddr);
-	void CPY(uint16_t oprAddr);
-	void DEC(uint16_t oprAddr);
+	void CMP();
+	void CPX();
+	void CPY();
+	void DEC();
 	void DEX();
 	void DEY();
-	void EOR(uint16_t oprAddr);
-	void INC(uint16_t oprAddr);
+	void EOR();
+	void INC();
 	void INX();
 	void INY();
-	void JMP(uint16_t oprAddr);
-	void JSR(uint16_t oprAddr);
-	void LDA(uint16_t oprAddr);
-	void LDX(uint16_t oprAddr);
-	void LDY(uint16_t oprAddr);
-	void LSR(uint16_t oprAddr);
-	void LSRACC(uint16_t oprAddr);
+	void JMP();
+	void JSR();
+	void LDA();
+	void LDX();
+	void LDY();
+	void LSR();
+	void LSRACC();
 	void NOP();
-	void ORA(uint16_t oprAddr);
+	void ORA();
 	void PHA();
 	void PHP();
 	void PLA();
 	void PLP();
-	void ROL(uint16_t oprAddr);
-	void ROLACC(uint16_t oprAddr);
-	void ROR(uint16_t oprAddr);
-	void RORACC(uint16_t oprAddr);
-	void RTI(uint16_t oprAddr);
-	void RTS(uint16_t oprAddr);
-	void SBC(uint16_t oprAddr);
+	void ROL();
+	void ROLACC();
+	void ROR();
+	void RORACC();
+	void RTI();
+	void RTS();
+	void SBC();
 	void SEC();
 	void SED();
 	void SEI();
-	void STA(uint16_t oprAddr);
-	void STX(uint16_t oprAddr);
-	void STY(uint16_t oprAddr);
+	void STA();
+	void STX();
+	void STY();
 	void TAX();
 	void TAY();
 	void TSX();
@@ -236,11 +236,11 @@ private:
 	// Hardaware
 	struct Registers {
 		uint16_t pc;
-		int8_t ac, y, x;
-		int8_t sr, sp;
+		uint8_t ac, y, x;
+		uint8_t sr, sp;
 	} m_xRegs;
 
-	std::shared_ptr<RAM> m_pRAM;
+	std::shared_ptr<MMU> m_pMMU;
 
 	// Timing
 	uint32_t m_nCycles;
@@ -251,9 +251,9 @@ private:
 	InterruptType m_eInterruptType;
 
 	// State
-	int8_t m_nOpCode;
+	uint8_t m_nOpCode;
 	Instruction m_xInstruction;
-	int16_t m_pOperandAddress;
+	uint16_t m_pOperandAddress;
 };
 }
 

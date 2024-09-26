@@ -4,7 +4,7 @@ find_package(glm REQUIRED)
 find_package(glfw3 REQUIRED)
 find_package(GLEW REQUIRED)
 
-set(PANE_CXX_SOURCES main.cc cpu.cc ram.cc ppu.cc window.cc renderer.cc emulator.cc)
+set(PANE_CXX_SOURCES main.cc cpu.cc mmu.cc ppu.cc window.cc renderer.cc emulator.cc)
 add_executable(pane ${PANE_CXX_SOURCES})
 
 target_link_libraries(pane GLEW::glew ${OPENGL_LIBRARIES} glfw glm)
